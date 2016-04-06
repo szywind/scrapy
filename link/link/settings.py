@@ -13,3 +13,5 @@ SPIDER_MODULES = ['link.spiders']
 NEWSPIDER_MODULE = 'link.spiders'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 
+DOWNLOAD_DELAY = 0.25
+COOKIES_ENABLED = False

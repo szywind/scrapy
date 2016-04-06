@@ -54,7 +54,7 @@ class LinkSpider(Spider):
         for i in range(pgNum):
             each_url = url.format(CITY=city, CURR_PAGE=i+1)
             #调用分页后的页面
-            yield Request(each_url,callback=self.get_joburls_bypage)
+            yield Request(each_url,callback=self.get_joburls_bypage, headers={'referer': 'http://www.dianping.com'})
 
     #解析职位检索结果页面上的所有职位的链接，插入表中
     def get_joburls_bypage(self, response):
@@ -68,3 +68,7 @@ class LinkSpider(Spider):
             if 1:   # keep all posts
                 open('../output/link_output/link.txt', 'ab').write('https://www.dianping.com'+link+'\n')
 
+
+    # def start_requests(self):
+    #     yield Request("http://www.dianping.com",
+    #                   headers={'User-Agent': "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"})
