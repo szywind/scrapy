@@ -1,12 +1,8 @@
 # encoding: utf-8
 
 from scrapy.spiders import Spider
-from scrapy.selector import HtmlXPathSelector
 from scrapy.http import Request
 import scrapy
-import os
-import sys
-import datetime
 
 #定义爬虫的业务逻辑实现类
 class LinkSpider(Spider):
@@ -21,7 +17,7 @@ class LinkSpider(Spider):
     def set_url(self):
         url_list = []
 
-        for i in xrange(10):
+        for i in xrange(2320):  #2310 SanSha
             url = self.dianping_urlpattern
             url = url.format(CITY=str(i), CURR_PAGE=1)
             url_list.append(url)
@@ -36,8 +32,11 @@ class LinkSpider(Spider):
         # print("foo = ", hxs)
         # print("pg_info = ", raw_pg_info)
 
-        pattern = r'_hip=\["_setCityId", "(\w+)"\]'
-        city = response.xpath('//script').re(pattern)
+        raw_city = scrapy.Selector(text=response.body).xpath('//input[@class="J-search-input"]/@data-s-cityid').extract()
+        try:
+            city = int(raw_city[0])
+        except IndexError:
+            return
 
         print("city = ", city)
         # 如果没有找到末页的连接，说明只有一页
@@ -65,9 +64,7 @@ class LinkSpider(Spider):
 
         print("links = ", links)
 
-        # 找到每个职位的发布日期，如果发布日期是当天的，就入库
-        for link in enumerate(links):
-            #if (links_jobdate[idx].find(today2)>-1):    # screen out today's post
+        for link in links:
             if 1:   # keep all posts
                 open('../output/link_output/link.txt', 'ab').write('https://www.dianping.com'+link+'\n')
 
