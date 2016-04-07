@@ -46,11 +46,30 @@ class PageSpider(Spider):
             brief_info = scrapy.Selector(text=response.body).xpath('//div[@class="brief-info"]').extract()[0].encode('utf-8')
             tmp = brief_info.split('</span>')
 
-            reviews = tmp[1].split('>')[1].decode("ascii", "ignore").encode('utf-8')
-            cost_person = tmp[2].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
-            taste_score = tmp[3].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
-            environment_score = tmp[4].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
-            service_score = tmp[5].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
+            try:
+                reviews = tmp[1].split('>')[1].decode("ascii", "ignore").encode('utf-8')
+            except IndexError:
+                reviews = -1
+
+            try:
+                cost_person = tmp[2].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
+            except IndexError:
+                cost_person = -1
+
+            try:
+                taste_score = tmp[3].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
+            except IndexError:
+                taste_score = -1
+
+            try:
+                environment_score = tmp[4].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
+            except IndexError:
+                environment_score = -1
+
+            try:
+                service_score = tmp[5].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
+            except IndexError:
+                service_score = -1
 
             city = scrapy.Selector(text=response.body).xpath('//a[@class="city J-city"]/text()').extract()[0].encode('utf-8')
             local_region = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/a/span[@itemprop="locality region"]/text()').extract()[0].encode('utf-8')
