@@ -48,26 +48,31 @@ class PageSpider(Spider):
 
             try:
                 reviews = tmp[1].split('>')[1].decode("ascii", "ignore").encode('utf-8')
-            except IndexError:
+                reviews = int(reviews)
+            except (IndexError, ValueError):
                 reviews = -1
 
             try:
                 cost_person = tmp[2].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
-            except IndexError:
+                cost_person = int(cost_person)
+            except (IndexError, ValueError):
                 cost_person = -1
 
             try:
                 taste_score = tmp[3].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
-            except IndexError:
+                taste_score = float(taste_score)
+            except (IndexError, ValueError):
                 taste_score = -1
 
             try:
                 environment_score = tmp[4].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
-            except IndexError:
+                environment_score = float(environment_score)
+            except (IndexError, ValueError):
                 environment_score = -1
 
             try:
                 service_score = tmp[5].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
+                service_score = float(service_score)
             except IndexError:
                 service_score = -1
 
@@ -88,21 +93,21 @@ class PageSpider(Spider):
                     open_time = tmp.split(str_open_time)[1].split('</span>')[0].split('>')[1].strip()
                     break
 
-            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-            print("shop_name = ", shop_name)
-            print("food_img_url = ", food_img_url)
-            print("rank_star = ", rank_star)
-            print("reviews = ", reviews)
-            print("cost_person = ", cost_person)
-            print("taste_score = ", taste_score)
-            print("environment_score = ", environment_score)
-            print("service_score = ", service_score)
-            print("city = ", city)
-            print("local_region = ", local_region)
-            print("street_address =", street_address)
-            print("phone = ", phone)
-            print("open_time = ", open_time)
-            print("homepage = ", homepage)
+            # print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+            # print("shop_name = ", shop_name)
+            # print("food_img_url = ", food_img_url)
+            # print("rank_star = ", rank_star)
+            # print("reviews = ", reviews)
+            # print("cost_person = ", cost_person)
+            # print("taste_score = ", taste_score)
+            # print("environment_score = ", environment_score)
+            # print("service_score = ", service_score)
+            # print("city = ", city)
+            # print("local_region = ", local_region)
+            # print("street_address =", street_address)
+            # print("phone = ", phone)
+            # print("open_time = ", open_time)
+            # print("homepage = ", homepage)
 
 
             data = items.PageItem()
@@ -111,11 +116,11 @@ class PageSpider(Spider):
             data['shop_name'] = shop_name
             data['food_img_url'] = food_img_url
             data['rank_star'] = rank_star
-            data['reviews'] = int(reviews)
-            data['cost_person'] = int(cost_person)
-            data['taste_score'] = float(taste_score)
-            data['environment_score'] = float(environment_score)
-            data['service_score'] = float(service_score)
+            data['reviews'] = reviews
+            data['cost_person'] = cost_person
+            data['taste_score'] = taste_score
+            data['environment_score'] = environment_score
+            data['service_score'] =service_score
             data['city'] = city
             data['local_region'] = local_region
             data['street_address'] = street_address
@@ -123,7 +128,7 @@ class PageSpider(Spider):
             data['open_time'] = open_time
             data['homepage'] = homepage
 
-            print("file_id = ", data['file_id'])
+            # print("file_id = ", data['file_id'])
 
             return data
         except Exception as e:
