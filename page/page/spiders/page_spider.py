@@ -73,7 +73,7 @@ class PageSpider(Spider):
             try:
                 service_score = tmp[5].split('>')[-1].decode("ascii", "ignore").encode('utf-8')
                 service_score = float(service_score)
-            except IndexError:
+            except (IndexError, ValueError):
                 service_score = -1
 
             city = scrapy.Selector(text=response.body).xpath('//a[@class="city J-city"]/text()').extract()[0].encode('utf-8')

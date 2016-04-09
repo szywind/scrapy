@@ -13,3 +13,6 @@ SPIDER_MODULES = ['page.spiders']
 NEWSPIDER_MODULE = 'page.spiders'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 ITEM_PIPELINES = {'page.FilePipelines.PagePipeline':5}
+
+DOWNLOAD_DELAY = 2
+COOKIES_ENABLED = False
