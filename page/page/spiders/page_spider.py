@@ -6,8 +6,15 @@ from scrapy.http import Request
 import scrapy
 from page import items
 import traceback
+import os
 import sys
 import datetime
+
+def filterURL(url_list):
+    exist_page_list = os.listdir('../output/page_output')
+    exist_page_id = [s.split("_")[1].split(".txt")[0] for s in exist_page_list]
+    filtered_url_list = [i for i in url_list if i.split("/")[-1] in exist_page_id]
+    return filtered_url_list
 
 #定义要抓取页面的爬虫类
 class PageSpider(Spider):
@@ -20,18 +27,11 @@ class PageSpider(Spider):
 
     #从jobs_task表中读出要抓取的链接列表，放入数组中
     def set_url(self):
-        url_list = []
         link_file = open('../output/link_output/link.txt', 'r')
-        loops = 0
-        for each_link in link_file:
-            each_link = each_link.replace('\r','')
-            each_link = each_link.replace('\n','')
-            url_list.append(each_link)
-            # loops+=1
-            # if (loops == 100):
-            #     break
+        url_list = [line.replace('\r','').replace('\n','') for line in link_file]
         link_file.close()
-        return url_list
+
+        return filterURL(url_list)
 
     def parse(self, response):
         try:
@@ -77,7 +77,10 @@ class PageSpider(Spider):
                 service_score = -1
 
             city = scrapy.Selector(text=response.body).xpath('//a[@class="city J-city"]/text()').extract()[0].encode('utf-8')
-            local_region = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/a/span[@itemprop="locality region"]/text()').extract()[0].encode('utf-8')
+            try:
+                local_region = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/a/span[@itemprop="locality region"]/text()').extract()[0].encode('utf-8')
+            except IndexError:
+                local_region = ""
             street_address = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/span[@itemprop="street-address"]/@title').extract()[0].encode('utf-8')
             phone = scrapy.Selector(text=response.body).xpath('//p[@class="expand-info tel"]/span[@itemprop="tel"]/text()').extract()   # may have multiple phone numbers
 
