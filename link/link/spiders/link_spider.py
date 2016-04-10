@@ -66,7 +66,7 @@ class LinkSpider(Spider):
 
         for link in links:
             if 1:   # keep all posts
-                open('../output/link_output/link.txt', 'ab').write('https://www.dianping.com'+link+'\n')
+                open('../output/link_output/link-2.txt', 'ab').write('https://www.dianping.com'+link+'\n')
 
 
     # def start_requests(self):
