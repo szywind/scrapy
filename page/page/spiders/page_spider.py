@@ -12,9 +12,19 @@ import datetime
 
 def filterURL(url_list):
     exist_page_list = os.listdir('../output/page_output')
-    exist_page_id = [s.split("_")[1].split(".txt")[0] for s in exist_page_list]
-    filtered_url_list = [i for i in url_list if i.split("/")[-1] in exist_page_id]
-    return filtered_url_list
+
+    # exist_page_id = [s.split("_")[1].split(".txt")[0] for s in exist_page_list]
+    # filtered_url_list = [i for i in url_list if i.split("/")[-1] in exist_page_id]
+
+    for a in exist_page_list:
+        id = a[a.rfind("_")+1: a.rfind(".txt")]
+        fname = 'https://www.dianping.com/shop/' + id
+        try:
+            url_list.remove(fname)
+        except ValueError:
+            pass
+    print "left # of pages: ", len(url_list)
+    return url_list
 
 #定义要抓取页面的爬虫类
 class PageSpider(Spider):
