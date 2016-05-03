@@ -34,3 +34,7 @@ class PageItem(Item):
     open_time = Field()
     #主页
     homepage = Field()
+    #纬度
+    latitude = Field()
+    #经度
+    longitude = Field()
