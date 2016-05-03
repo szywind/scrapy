@@ -7,11 +7,16 @@ import scrapy
 from page import items
 import traceback
 import os
+import urllib
+import re
 import sys
 import datetime
 
+
+
 def filterURL(url_list):
-    exist_page_list = os.listdir('../output/page_output')
+    # exist_page_list = os.listdir('../output/page_output')
+    exist_page_list = os.listdir('/Users/shenzhenyuan/Desktop/page_output')
 
     # exist_page_id = [s.split("_")[1].split(".txt")[0] for s in exist_page_list]
     # filtered_url_list = [i for i in url_list if i.split("/")[-1] in exist_page_id]
@@ -23,12 +28,17 @@ def filterURL(url_list):
             url_list.remove(fname)
         except ValueError:
             pass
-    print "left # of pages: ", len(url_list)
+    print "left # of pages: ", len(url_list)    # total is 1194202
+
+    # save left pages url to a file
+    with open("/Users/shenzhenyuan/Desktop/left_links.txt", "wt") as fl:
+        for link in url_list:
+            fl.write(link + "\n")
     return url_list
 
 #定义要抓取页面的爬虫类
 class PageSpider(Spider):
-    default = "None"
+    default = ""
     name = "page"    
     start_urls = []
     
@@ -37,10 +47,10 @@ class PageSpider(Spider):
 
     #从jobs_task表中读出要抓取的链接列表，放入数组中
     def set_url(self):
-        link_file = open('../output/link_output/link.txt', 'r')
+        link_file = open('../output/link_output/link-2.txt', 'r')
         url_list = [line.replace('\r','').replace('\n','') for line in link_file]
+        # url_list = url_list[:2]
         link_file.close()
-
         return filterURL(url_list)
 
     def parse(self, response):
@@ -50,7 +60,11 @@ class PageSpider(Spider):
             homepage = response.url
 
             shop_name = scrapy.Selector(text=response.body).xpath('//h1[@class="shop-name"]/text()').extract()[0].encode('utf-8').strip()
-            food_img_url = scrapy.Selector(text=response.body).xpath('//meta[@itemprop="image"]/@content').extract()[0]
+
+            try:
+                food_img_url = scrapy.Selector(text=response.body).xpath('//meta[@itemprop="image"]/@content').extract()[0]
+            except IndexError:
+                food_img_url = self.default
             rank_star = scrapy.Selector(text=response.body).xpath('//div[@class="brief-info"]/span[1]/@class').extract()[0].split()[1]
 
             brief_info = scrapy.Selector(text=response.body).xpath('//div[@class="brief-info"]').extract()[0].encode('utf-8')
@@ -86,14 +100,37 @@ class PageSpider(Spider):
             except (IndexError, ValueError):
                 service_score = -1
 
-            city = scrapy.Selector(text=response.body).xpath('//a[@class="city J-city"]/text()').extract()[0].encode('utf-8')
+            try:
+                city = scrapy.Selector(text=response.body).xpath('//a[@class="city J-city"]/text()').extract()[0].encode('utf-8')
+            except (IndexError, ValueError):
+                city = self.default
+
             try:
                 local_region = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/a/span[@itemprop="locality region"]/text()').extract()[0].encode('utf-8')
-            except IndexError:
-                local_region = ""
-            street_address = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/span[@itemprop="street-address"]/@title').extract()[0].encode('utf-8')
-            phone = scrapy.Selector(text=response.body).xpath('//p[@class="expand-info tel"]/span[@itemprop="tel"]/text()').extract()   # may have multiple phone numbers
+            except (IndexError, ValueError):
+                local_region = self.default
 
+
+            try:
+                street_address = scrapy.Selector(text=response.body).xpath('//div[@class="expand-info address"]/span[@itemprop="street-address"]/@title').extract()[0].encode('utf-8')
+            except (IndexError, ValueError):
+                street_address = self.default
+
+            try:
+                temp = response.body
+                temp = temp[temp.find("lng:"):]
+                raw_geo_point = temp[:temp.find("}")].split(",")
+
+                lng = float(raw_geo_point[0].split(":")[1])
+                lat = float(raw_geo_point[1].split(':')[1])
+            except (IndexError, ValueError):
+                lng = -1
+                lat = -1
+
+            try:
+                phone = scrapy.Selector(text=response.body).xpath('//p[@class="expand-info tel"]/span[@itemprop="tel"]/text()').extract()   # may have multiple phone numbers
+            except (IndexError, ValueError):
+                phone = [self.default]
             other_info = scrapy.Selector(text=response.body).xpath('//div[@class="other J-other Hide"]/p').extract()
 
             open_time = self.default
@@ -121,7 +158,8 @@ class PageSpider(Spider):
             # print("phone = ", phone)
             # print("open_time = ", open_time)
             # print("homepage = ", homepage)
-
+            # print("lat = ", lat)
+            # print("lng = ", lng)
 
             data = items.PageItem()
 
@@ -140,6 +178,8 @@ class PageSpider(Spider):
             data['phone'] = phone
             data['open_time'] = open_time
             data['homepage'] = homepage
+            data['longitude'] = lng
+            data['latitude'] = lat
 
             # print("file_id = ", data['file_id'])
 
@@ -148,4 +188,4 @@ class PageSpider(Spider):
             print "ERROR PARSE"
             print response.url
             print traceback.format_exc()
-			#self.jobsTool.updateCrulInfo(ConfigPropObj.liepin_webid, response.url, 2, e)
+

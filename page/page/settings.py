@@ -14,7 +14,7 @@ NEWSPIDER_MODULE = 'page.spiders'
 USER_AGENT = '%s/%s' % (BOT_NAME, BOT_VERSION)
 ITEM_PIPELINES = {'page.FilePipelines.PagePipeline':5}
 
-DOWNLOAD_DELAY = 0.25
+DOWNLOAD_DELAY = 0
 COOKIES_ENABLED = False
 
 USER_AGENT_LIST = [
