@@ -65,8 +65,10 @@ class PageSpider(Spider):
                 food_img_url = scrapy.Selector(text=response.body).xpath('//meta[@itemprop="image"]/@content').extract()[0]
             except IndexError:
                 food_img_url = self.default
-            rank_star = scrapy.Selector(text=response.body).xpath('//div[@class="brief-info"]/span[1]/@class').extract()[0].split()[1]
-
+            try:
+                rank_star = scrapy.Selector(text=response.body).xpath('//div[@class="brief-info"]/span[1]/@class').extract()[0].split()[1]
+            except IndexError:
+                rank_star = -1
             brief_info = scrapy.Selector(text=response.body).xpath('//div[@class="brief-info"]').extract()[0].encode('utf-8')
             tmp = brief_info.split('</span>')
 
