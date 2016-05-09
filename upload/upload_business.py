@@ -272,7 +272,7 @@ def already_exist(q_homepage):
         current_business = query.first()
         return current_business
     except leancloud.errors.LeanCloudError:
-         return None
+        return None
 
 def upload_one_file(filename):
     '''
